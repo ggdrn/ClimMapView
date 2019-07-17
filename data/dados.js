@@ -1,4 +1,4 @@
-var dados = ﻿{
+var dados = {
   "features": [
     {
       "type": "Feature",

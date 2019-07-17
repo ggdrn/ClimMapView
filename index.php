@@ -15,15 +15,12 @@
         // Esta função vai percorrer a informação contida na variável dados
         // e cria os marcadores através da função createMarker
         function displayMarkers(){
-
           // esta variável vai definir a área de mapa a abranger e o nível do zoom
           // de acordo com as posições dos marcadores
           var bounds = new google.maps.LatLngBounds();
 
           // Loop que vai percorrer a informação contida em dados
           // para que a função createMarker possa criar os marcadores
-
-        // console.log(dados.features[3].properties.RESPONSÁVEL); //
         for (var i = 0; i < dados.features.length; i++){
           var latlng = new google.maps.LatLng( dados.features[i].properties.Y,  dados.features[i].properties.X);
           var nome = dados.features[i].properties.NOME;
@@ -52,7 +49,7 @@
          // as posições dos marcadores
           map.fitBounds(bounds);
         }
-
+console.log(dados.features[1].properties.RESPONSÁVEL);
 // Função que cria os marcadores e define o conteúdo de cada Info Window.
 function createMarker(nome, operadora, responsavel, altitude, x, y, latlng, id, estado, municipio, bacia, subbacia, ec, ep, rc){
    var marker = new google.maps.Marker({
