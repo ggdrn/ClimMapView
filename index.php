@@ -85,13 +85,6 @@
          // as posições dos marcadores
           //map.fitBounds(bounds);
         }
-        map.addListener('center_changed', function() {
-               // 1 segundo de animação até clicar no indicador, fazendo uma transição mais suave
-               window.setTimeout(function() {
-                 map.panTo(marker.getPosition());
-               }, 1000);
-             });
-
 // Função que cria os marcadores e define o conteúdo de cada Info Window.
 function createMarker(nome, operadora, responsavel, altitude, x, y, latlng, id, estado, municipio, bacia, subbacia, ec, ep, rc){
    var marker = new google.maps.Marker({
@@ -100,7 +93,6 @@ function createMarker(nome, operadora, responsavel, altitude, x, y, latlng, id, 
       title: nome,
       icon: image,
    });
-
    // Evento que dá instrução à API para estar alerta ao click no marcador.
    // Define o conteúdo e abre a Info Window.
    google.maps.event.addListener(marker, 'click', function() {
@@ -152,8 +144,6 @@ function createMarker(nome, operadora, responsavel, altitude, x, y, latlng, id, 
           map.setCenter(marker.getPosition());
    });
  }
-
-
      function initialize() {
        var mapOptions = {
            center: new google.maps.LatLng(-22.379999,-42.500000),
@@ -164,7 +154,6 @@ function createMarker(nome, operadora, responsavel, altitude, x, y, latlng, id, 
         // Para iniciar com a posição do usuário
         if(navigator.geolocation) { //checa se a geocalização esta ativa
           navigator.geolocation.getCurrentPosition(function(position){
-            console.log(position.coords.latitude, position.coords.longitude);
             var myLatLng = {
               lat: position.coords.latitude,
               lng: position.coords.longitude
@@ -175,20 +164,14 @@ function createMarker(nome, operadora, responsavel, altitude, x, y, latlng, id, 
               title: 'Você está aqui',
               icon: pessoa
             });
-          //Mesmo esquema de zoom do código a cima.
-          map.addListener('center_changed', function() {
-            window.setTimeout(function() {
-              map.panTo(posicao.getPosition());
-              }, 1000);
-          });
-
+        //Mesmo esquema de zoom do código a cima.
         posicao.addListener('click', function() {
           map.setZoom(13);
           map.setCenter(posicao.getPosition());
         });
+        //Se achar a geolcalicação, inicar aqui!
           map.setCenter(myLatLng);
         });
-
         }
         // Cria a nova Info Window com referência à variável infoWindow.
         // O conteúdo da Info Window é criado na função createMarker.
