@@ -6,6 +6,27 @@
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0 }
       #map_canvas { height: 100% }
+      #goCenterUI, #setCenterUI {
+        background-color: #fff;
+        border: 2px solid #fff;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px rgba(0,0,0,.3);
+        cursor: pointer;
+        float: left;
+        margin-bottom: 22px;
+        text-align: center;
+      }
+      #goCenterText, #setCenterText {
+        color: rgb(25,25,25);
+        font-family: Roboto,Arial,sans-serif;
+        font-size: 15px;
+        line-height: 25px;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      #setCenterUI {
+        margin-left: 12px;
+      }
     </style>
     <!--- Bootstrap--->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -23,6 +44,10 @@
         var image = {
           url: "icon/nuvem-azul.png", //
           scaledSize: new google.maps.Size(25,25), // scaled size
+        };
+        var pessoa = {
+          url: "icon/pin.png", //
+          scaledSize: new google.maps.Size(30,30), // scaled size
         };
         // Esta função vai percorrer a informação contida na variável dados
         // e cria os marcadores através da função createMarker
@@ -58,8 +83,15 @@
          // a API, através da sua função fitBounds, vai redefinir o nível do zoom
          // e consequentemente a área do mapa abrangida de acordo com
          // as posições dos marcadores
-          map.fitBounds(bounds);
+          //map.fitBounds(bounds);
         }
+        map.addListener('center_changed', function() {
+               // 1 segundo de animação até clicar no indicador, fazendo uma transição mais suave
+               window.setTimeout(function() {
+                 map.panTo(marker.getPosition());
+               }, 1000);
+             });
+
 // Função que cria os marcadores e define o conteúdo de cada Info Window.
 function createMarker(nome, operadora, responsavel, altitude, x, y, latlng, id, estado, municipio, bacia, subbacia, ec, ep, rc){
    var marker = new google.maps.Marker({
@@ -68,6 +100,7 @@ function createMarker(nome, operadora, responsavel, altitude, x, y, latlng, id, 
       title: nome,
       icon: image,
    });
+
    // Evento que dá instrução à API para estar alerta ao click no marcador.
    // Define o conteúdo e abre a Info Window.
    google.maps.event.addListener(marker, 'click', function() {
@@ -114,15 +147,49 @@ function createMarker(nome, operadora, responsavel, altitude, x, y, latlng, id, 
       infoWindow.setContent(conteudo);
       // A Info Window é aberta com um click no marcador.
       infoWindow.open(map, marker);
+      // Da um zoom ao clicar na posição
+      map.setZoom(13);
+          map.setCenter(marker.getPosition());
    });
  }
+
+
      function initialize() {
        var mapOptions = {
            center: new google.maps.LatLng(-22.379999,-42.500000),
-           zoom: 8,
-           mapTypeId: 'roadmap',
+           zoom: 12,
+           mapTypeId: 'roadmap'
         };
         map = new google.maps.Map(document.getElementById('ClimMapView'), mapOptions);
+        // Para iniciar com a posição do usuário
+        if(navigator.geolocation) { //checa se a geocalização esta ativa
+          navigator.geolocation.getCurrentPosition(function(position){
+            console.log(position.coords.latitude, position.coords.longitude);
+            var myLatLng = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var posicao = new google.maps.Marker({
+              position: myLatLng,
+              map: map,
+              title: 'Você está aqui',
+              icon: pessoa
+            });
+          //Mesmo esquema de zoom do código a cima.
+          map.addListener('center_changed', function() {
+            window.setTimeout(function() {
+              map.panTo(posicao.getPosition());
+              }, 1000);
+          });
+
+        posicao.addListener('click', function() {
+          map.setZoom(13);
+          map.setCenter(posicao.getPosition());
+        });
+          map.setCenter(myLatLng);
+        });
+
+        }
         // Cria a nova Info Window com referência à variável infoWindow.
         // O conteúdo da Info Window é criado na função createMarker.
         infoWindow = new google.maps.InfoWindow();
@@ -138,7 +205,6 @@ google.maps.event.addDomListener(window, 'load', initialize);
 </script>
   </head>
   <body onload="initialize()">
-    <span class="glyphicon glyphicon-download-alt"></span>
     <div id="ClimMapView" style="width:100%; height:100%"></div>
   </body>
 </html>
