@@ -6,27 +6,33 @@
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0 }
       #map_canvas { height: 100% }
-      #goCenterUI, #setCenterUI {
-        background-color: #fff;
-        border: 2px solid #fff;
-        border-radius: 3px;
-        box-shadow: 0 2px 6px rgba(0,0,0,.3);
-        cursor: pointer;
-        float: left;
-        margin-bottom: 22px;
-        text-align: center;
-      }
-      #goCenterText, #setCenterText {
-        color: rgb(25,25,25);
-        font-family: Roboto,Arial,sans-serif;
-        font-size: 15px;
-        line-height: 25px;
-        padding-left: 5px;
-        padding-right: 5px;
-      }
-      #setCenterUI {
-        margin-left: 12px;
-      }
+      #floating-panel {
+              position: absolute;
+              top: 10px;
+              left: 25%;
+              z-index: 5;
+              background-color: #fff;
+              padding: 5px;
+              border: 1px solid #999;
+              text-align: center;
+              font-family: 'Roboto','sans-serif';
+              line-height: 30px;
+              padding-left: 10px;
+            }
+            #floating-panel {
+              position: absolute;
+              top: 5px;
+              left: 50%;
+              margin-left: -180px;
+              width: 350px;
+              z-index: 5;
+              background-color: #fff;
+              padding: 5px;
+              border: 1px solid #999;
+            }
+            #latlng {
+              width: 225px;
+            }
     </style>
     <!--- Bootstrap--->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -47,6 +53,10 @@
         };
         var pessoa = {
           url: "icon/pin.png", //
+          scaledSize: new google.maps.Size(30,30), // scaled size
+        };
+        var marker_busca = {
+          url: "icon/Map-Marker-Push-Pin-1-Azure-256.png", //
           scaledSize: new google.maps.Size(30,30), // scaled size
         };
         // Esta função vai percorrer a informação contida na variável dados
@@ -188,6 +198,47 @@ google.maps.event.addDomListener(window, 'load', initialize);
 </script>
   </head>
   <body onload="initialize()">
+    <div id="floating-panel">
+      <input id="latlng" type="text" value="-22.379999,-42.500000">
+      <input id="submit" type="button" value="Pesquisar">
+    </div>
     <div id="ClimMapView" style="width:100%; height:100%"></div>
+    <script>
+
+        var geocoder = new google.maps.Geocoder;
+        var infowindow = new google.maps.InfoWindow;
+
+        document.getElementById('submit').addEventListener('click', function() {
+          geocodeLatLng(geocoder, map, infowindow);
+        });
+
+      function geocodeLatLng(geocoder, map, infowindow) {
+        var input = document.getElementById('latlng').value;
+        var latlngStr = input.split(',', 2);
+        var latlng = {lat: parseFloat(latlngStr[0]), lng: parseFloat(latlngStr[1])};
+        geocoder.geocode({'location': latlng}, function(results, status) {
+          if (status === 'OK') {
+            if (results[0]) {
+              map.setZoom(11);
+              var marker = new google.maps.Marker({
+                position: latlng,
+                map: map,
+                icon: marker_busca
+              });
+              // Ao clicar, remove o pin
+              google.maps.event.addListener(marker, 'click', function() {
+                marker.setMap(null);
+              });
+              infowindow.setContent(results[0].formatted_address);
+              infowindow.open(map, marker);
+            } else {
+              window.alert('Nenhum resultado foi encontrado');
+            }
+          } else {
+            window.alert('Geocoder failed due to: ' + status);
+          }
+        });
+      }
+    </script>
   </body>
 </html>
