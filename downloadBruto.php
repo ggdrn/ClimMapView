@@ -1,6 +1,6 @@
 <?php
-error_reporting(E_ALL ^ E_DEPRECATED);
 require_once("dbconnect.php");
+error_reporting(E_ALL ^ E_DEPRECATED);
 
 ?>
 
@@ -68,18 +68,12 @@ require_once("dbconnect.php");
 
 			<?php
 			$_GET["id"];
-			$query = "SELECT nome, inicio, fim FROM estacao WHERE ".$_GET["id"]." = idEstacao";
+			dbconnect();
 			$db = dbconnect();
-			if ($stmt = $db->prepare($query)){
-				$stmt->execute();
-				//echo var_dump($stmt->num_rows());
-				$stmt->bind_result($nome, $periodoInicio, $periodoFim);
-				$stmt->fetch();
+			$query = "SELECT nome, inicio, fim FROM estacao WHERE ".$_GET["id"]." = idEstacao";
+			$resultado = mysql_query($query);
+			// var_dump($resultado);
 
-				list($anoInicio, $mesInicio, $diaInicio) = explode("-", $periodoInicio);
-				list($anoFim, $mesFim, $diaFim) = explode("-", $periodoFim);
-
-			}
 
 			?>
 

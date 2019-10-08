@@ -6,7 +6,15 @@ function dbconnect(){
   $mysqldb ="meteoro";
 
   $db = new mysqli($mysqlhost, $mysqluser, $mysqlpass, $mysqldb);
-  //mysqli_select_db($mysqldb,$db);
+  mysqli_select_db($mysqldb,$db);
+
+  // $mysqlhost ="localhost";
+  // $mysqluser ="edmeteoro@meteor";
+  // $mysqlpass ="5#HeKac5bre#"; //vertrigo
+  // $mysqldb ="meteoro";
+
+  $db = mysql_connect($mysqlhost, $mysqluser, $mysqlpass);
+  mysql_select_db($mysqldb,$db);
 
   if (!$db) {
       echo "Error: Unable to connect to MySQL." . PHP_EOL;
